@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.bd</groupId>
+	<artifactId>test-lift</artifactId>
+	<version>0.1.0</version>
+	<packaging>war</packaging>
+	<name>test-lift Project</name>
+	<inceptionYear>2016</inceptionYear>
+	<properties>
+		<jetty.http.port>8080</jetty.http.port>
+		<logback-classic.version>1.1.7</logback-classic.version>
+		<lift.version>2.6.3</lift.version>
+		<!-- <lift.majorMinorVersion> @see regex-property executions </lift.majorMinorVersion> -->
+		<scala.version>2.10.6</scala.version>
+		<!-- <scala.majorMinorVersion> @see regex-property executions </scala.majorMinorVersion> -->
+
+		<!-- Common plugin settings -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+		<!-- vscaladoc settings -->
+		<maven.scaladoc.vscaladocVersion>1.2-m1</maven.scaladoc.vscaladocVersion>
+		<vscaladoc.links.liftweb.pathsufix>scaladocs/</vscaladoc.links.liftweb.pathsufix>
+		<vscaladoc.links.liftweb.baseurl>https://oss.sonatype.org/content/groups/scala-tools/liftweb</vscaladoc.links.liftweb.baseurl>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>scala-tools.releases</id>
+			<name>Scala-Tools Dependencies Repository for Releases</name>
+			<url>https://oss.sonatype.org/content/groups/scala-tools</url>
+		</repository>
+		<repository>
+			<id>java.net.maven2</id>
+			<name>java.net Maven2 Repository</name>
+			<url>http://download.java.net/maven/2/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.releases</id>
+			<name>Scala-Tools Plugins Repository for Releases</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.liftweb</groupId>
+			<artifactId>lift-common_2.10</artifactId>
+			<version>2.6.3</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>scala-library</artifactId>
+					<groupId>org.scala-lang</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.2.10.v20150310</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback-classic.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.liftweb</groupId>
+			<artifactId>lift-webkit_2.10</artifactId>
+			<version>2.6.3</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src/main/scala</sourceDirectory>
+		<testSourceDirectory>src/test/scala</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.2.10.v20150310</version>
+				<configuration>
+			        <httpConnector>
+			          <port>${jetty.http.port}</port>
+			        </httpConnector>
+					<webApp>
+						<contextPath>/</contextPath>
+					</webApp>
+					<webAppSourceDirectory>
+						${project.basedir}/src/main/webapp
+					</webAppSourceDirectory>
+					<scanIntervalSeconds>0</scanIntervalSeconds>
+					<reload>manual</reload>
+					<systemProperties>
+						<systemProperty>
+							<name>logback.configurationFile</name>
+							<value>./src/main/resources/logback.xml</value>
+						</systemProperty>
+					</systemProperties>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>ch.qos.logback</groupId>
+						<artifactId>logback-classic</artifactId>
+						<version>${logback-classic.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<recompileMode>incremental</recompileMode>
+				</configuration>
+				<executions>
+					<execution>
+						<id>scala-compile-first</id>
+						<phase>process-resources</phase>
+						<goals>
+							<!-- <goal>add-source</goal> -->
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<additionalProjectnatures>
+						<projectnature>ch.epfl.lamp.sdt.core.scalanature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>ch.epfl.lamp.sdt.core.scalabuilder</buildcommand>
+					</additionalBuildcommands>
+					<classpathContainers>
+						<classpathContainer>ch.epfl.lamp.sdt.launching.SCALA_CONTAINER</classpathContainer>
+						<classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
+					</classpathContainers>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.17</version>
+				<configuration>
+					<usefile>false</usefile>
+					<disablexmlreport>true</disablexmlreport>
+					<useSystemClassLoader>false</useSystemClassLoader>
+					<argLine>-Xmx512m</argLine>
+					<includes>
+						<include>**/*Spec2.*</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.15.2</version>
+				<configuration>
+					<charset>${project.build.sourceEncoding}</charset>
+					<jvmArgs>
+						<jvmArg>-Xmx1024m</jvmArg>
+						<jvmArg>-DpackageLinkDefs=file://${project.build.directory}/packageLinkDefs.properties</jvmArg>
+					</jvmArgs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+</project>
